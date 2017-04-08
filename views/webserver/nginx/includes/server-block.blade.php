@@ -1,15 +1,23 @@
 
 server {
 
-    listen {{ $config->port->http or 80 }};
+    listen 80;
+    @if(isset($hostname))
+        server_name {{ $hostname->hostname }};
+    @else
+        server_name {{ $hostnames->implode('hostname', ' ') }};
+    @endif
+    return 302 https://$server_name$request_uri;
+}
+
+server {
 
     @if(isset($ssl))
-    listen {{ $config->port->https or 443 }} ssl spdy;
-    ssl_certificate_key {{ $ssl->pathKey }};
+    listen {{ $config->port->https or 443 }} ssl http2;
+    include snippets/ssl-params.conf;
     ssl_certificate {{ $ssl->pathPem }};
+    ssl_certificate_key {{ $ssl->pathKey }};
     @endif
-
-
 
     # server hostnames
     @if(isset($hostname))
@@ -40,14 +48,14 @@ server {
     @if($website->directory->media())
     # attempt to passthrough to image service
     location ~* ^/media/(.+)$ {
-        alias 		{{ $website->directory->media() }}$1;
+        alias       {{ $website->directory->media() }}$1;
     }
     @endif
 
     @if($website->directory->cache())
     # map public cache folder to private domain folder
     location /cache/ {
-        alias 		{{ $website->directory->cache() }};
+        alias       {{ $website->directory->cache() }};
     }
     @endif
 
@@ -57,7 +65,7 @@ server {
     }
     # pass the PHP scripts to FastCGI server from upstream phpfcgi
     location ~ \.php(/|$) {
-        fastcgi_pass    unix:/var/run/php/php7.0-fpm.hyn-{{ $fpm_port + $website->id }}.sock;
+        fastcgi_pass    unix:/run/php/php7.1-fpm.sock;
         include         fastcgi_params;
 
         fastcgi_split_path_info ^(.+\.php)(/.*)$;
