@@ -37,7 +37,6 @@ server {
     ssl_prefer_server_ciphers on;
     ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
     ssl_ecdh_curve secp384r1;
-    ssl_session_cache shared:SSL:10m;
     ssl_session_tickets off;
     ssl_stapling on;
     ssl_stapling_verify on;
@@ -84,7 +83,7 @@ server {
 
     location ~ \.php$ {
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass 127.0.0.1:9100;
+        fastcgi_pass 127.0.0.1:9070;
         fastcgi_index index.php;
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
