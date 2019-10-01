@@ -1,4 +1,3 @@
 # Multi tenancy
 
-A Modified version for BisGame AB.
-
+> Note: This version is outdated and do not use in production. Only for Bisgame. 
